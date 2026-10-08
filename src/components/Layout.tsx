@@ -1,15 +1,18 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { CambioProvider } from '../contexts/CambioContext'
+import { DadosProvider } from '../contexts/DadosContext'
 import { usePreferencias } from '../contexts/PreferenciasContext'
 
 const itens = [
   { para: '/', rotulo: 'Patrimônio', icone: '◔' },
+  { para: '/lancar', rotulo: 'Lançar', icone: '✎' },
   { para: '/ativos', rotulo: 'Ativos', icone: '▤' },
   { para: '/rendimentos', rotulo: 'Rendimentos', icone: '＄' },
   { para: '/favoritos', rotulo: 'Favoritos', icone: '★' },
   { para: '/metas', rotulo: 'Metas', icone: '◎' },
   { para: '/comparar', rotulo: 'Comparar', icone: '⇄' },
-  { para: '/seguranca', rotulo: 'Segurança', icone: '⚿' },
+  { para: '/ajustes', rotulo: 'Ajustes', icone: '⚙' },
 ]
 
 export default function Layout() {
@@ -73,10 +76,14 @@ export default function Layout() {
         {possuiMfa === false && (
           <div className="aviso">
             Proteja a conta com verificação em duas etapas.{' '}
-            <NavLink to="/seguranca">Ativar agora</NavLink>
+            <NavLink to="/ajustes">Ativar agora</NavLink>
           </div>
         )}
-        <Outlet />
+        <DadosProvider>
+          <CambioProvider>
+            <Outlet />
+          </CambioProvider>
+        </DadosProvider>
         <footer className="rodape">Conectado como {email}</footer>
       </main>
     </div>

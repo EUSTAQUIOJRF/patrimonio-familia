@@ -6,10 +6,11 @@ import { PreferenciasProvider } from './contexts/PreferenciasContext'
 import { supabaseConfigurado } from './lib/supabase'
 import EmBreve from './pages/EmBreve'
 import EsqueciSenha from './pages/EsqueciSenha'
-import Inicio from './pages/Inicio'
+import Ajustes from './pages/Ajustes'
+import Lancar from './pages/Lancar'
+import Patrimonio from './pages/Patrimonio'
 import Login from './pages/Login'
 import RedefinirSenha from './pages/RedefinirSenha'
-import Seguranca from './pages/Seguranca'
 import VerificarMfa from './pages/VerificarMfa'
 
 function Porteiro() {
@@ -39,13 +40,15 @@ function Porteiro() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Inicio />} />
+        <Route index element={<Patrimonio />} />
+        <Route path="lancar" element={<Lancar />} />
         <Route path="ativos" element={<EmBreve titulo="Ativos" fase="Fase 2" />} />
         <Route path="rendimentos" element={<EmBreve titulo="Rendimentos" fase="Fase 2" />} />
         <Route path="favoritos" element={<EmBreve titulo="Favoritos e notícias" fase="Fase 3" />} />
         <Route path="metas" element={<EmBreve titulo="Metas" fase="Fase 4" />} />
         <Route path="comparar" element={<EmBreve titulo="Comparar ativos" fase="Fase 5" />} />
-        <Route path="seguranca" element={<Seguranca />} />
+        <Route path="ajustes" element={<Ajustes />} />
+        <Route path="seguranca" element={<Navigate to="/ajustes" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

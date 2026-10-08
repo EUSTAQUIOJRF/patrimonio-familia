@@ -1,9 +1,10 @@
-# Patrimônio Família — Fase 0
+# Patrimônio Família — Fases 0 e 1
 
-Web-app (PWA) para acompanhar o patrimônio da família. Esta é a **Fase 0**: a fundação.
+Web-app (PWA) para acompanhar o patrimônio da família.
 
-**O que já funciona:** login com e-mail e senha, recuperação de senha por e-mail, verificação em duas etapas (opcional, mas recomendada), menu, botão **R$ ↔ US$**, **modo privacidade** (esconde os valores) e instalação no celular (PWA).
-**O que ainda não existe:** as telas reais de patrimônio (Fase 1) e as demais. O número que aparece na tela inicial é só um exemplo fictício.
+- **Fase 0 (fundação):** login, 2 etapas, recuperação de senha, modo privacidade, botão R$ ↔ US$.
+- **Fase 1 (coração do app):** tela **Patrimônio** (Família, Eu, Esposa, Filho), tela **Lançar saldos**, câmbio do dia, gráficos e **Ajustes**. Os passos da Fase 1 estão no fim deste arquivo.
+
 
 ---
 
@@ -76,7 +77,7 @@ Em **Authentication → URL Configuration**:
 
 ## Passo 8 — Ativar a verificação em duas etapas
 
-Entre no app → menu **Segurança → Ativar**. Leia o QR code com Google Authenticator, Microsoft Authenticator ou Authy e confirme com o código de 6 dígitos. Faça isso nas duas contas.
+Entre no app → menu **Ajustes → Segurança → Ativar**. Leia o QR code com Google Authenticator, Microsoft Authenticator ou Authy e confirme com o código de 6 dígitos. Faça isso nas duas contas.
 
 ## Passo 9 — Instalar no celular
 
@@ -91,7 +92,7 @@ Entre no app → menu **Segurança → Ativar**. Leia o QR code com Google Authe
 - [ ] "Esqueci minha senha" → e-mail chega → link abre o app na tela de nova senha.
 - [ ] Botão **R$ → US$** troca o valor grande e o pequeno.
 - [ ] Botão **Oculto/Visível** esconde os valores e continua assim ao recarregar.
-- [ ] Segurança → ativar 2 etapas → sair → entrar de novo pedindo o código.
+- [ ] Ajustes → Segurança → ativar 2 etapas → sair → entrar de novo pedindo o código.
 
 ## Observações importantes
 
@@ -103,8 +104,58 @@ Entre no app → menu **Segurança → Ativar**. Leia o QR code com Google Authe
 
 ```
 supabase/01_schema_fase1.sql   tabelas e regras de segurança
-src/contexts/                  login (AuthContext) e preferências (privacidade, moeda)
+supabase/02_fase1.sql          função ping() (manter o projeto ativo)
+.github/workflows/             rotina que chama o ping() duas vezes por semana
+src/contexts/                  login, preferências (privacidade, moeda), dados e câmbio
+src/lib/calculos.ts            contas do patrimônio (testadas: npm test)
+src/lib/lancamento.ts          lógica do formulário de saldos (testada)
 src/pages/                     telas
-src/components/                menu, valores, moldura de login
+src/components/                menu, valores, gráficos
 netlify.toml                   configuração de publicação
 ```
+
+---
+
+# Fase 1 — como atualizar e usar
+
+## Passo A — Rodar o SQL novo no Supabase
+
+**SQL Editor → New query**, cole o conteúdo de `supabase/02_fase1.sql` e clique em **Run**. (O `01_schema_fase1.sql` já foi rodado na Fase 0 e não precisa rodar de novo.)
+
+## Passo B — Atualizar o projeto no seu computador e no GitHub
+
+1. Extraia o zip da Fase 1 **por cima** da pasta do projeto (o PowerShell faz isso: `Expand-Archive -Path "CAMINHO\patrimonio-familia-fase1.zip" -DestinationPath "." -Force`, estando dentro da pasta do projeto). Seu `.env.local` e seu `.gitignore` não são tocados.
+2. Apague o arquivo antigo que não é mais usado: `Remove-Item src\pages\Inicio.tsx`
+3. (Opcional) Teste local: `npm install` e `npm run dev`. Para rodar os testes dos cálculos: `npm test`.
+4. Envie para o GitHub; a Netlify publica sozinha:
+```powershell
+git add .
+git status --short
+git commit -m "Fase 1: patrimônio, lançamento de saldos e câmbio"
+git push
+```
+Confira no `git status` que `.env.local` não aparece.
+
+## Passo C — Manter o Supabase gratuito ativo (recomendado)
+
+O plano gratuito pausa projetos parados por vários dias. A rotina `.github/workflows/manter-supabase-ativo.yml` chama a função `ping()` duas vezes por semana. Para ela funcionar, no GitHub abra o repositório → **Settings → Secrets and variables → Actions → New repository secret** e crie:
+
+- `SUPABASE_URL` = a URL do projeto (`https://xxxx.supabase.co`)
+- `SUPABASE_CHAVE_PUBLICA` = a chave `sb_publishable_...`
+
+Para testar na hora: aba **Actions → Manter Supabase ativo → Run workflow**. Deve terminar em verde.
+(O GitHub desliga rotinas agendadas de repositórios sem nenhuma atividade por 60 dias; se isso acontecer, é só reativar na aba Actions. Usando o app todo mês, o projeto também fica ativo por conta própria.)
+
+## Como usar
+
+1. **Lançar:** escolha a pessoa e o mês, digite o saldo de cada banco/corretora (em R$ ou US$) e clique em **Salvar saldos**. Os valores do mês anterior aparecem como lembrete, e as instituições do mês passado já vêm na lista. Para um banco novo: **Adicionar banco ou corretora à lista → Nova instituição**.
+2. **Patrimônio:** abas Família, Eu, Esposa e Filho; escolha o mês; veja o total em R$ e US$ (o botão do topo inverte qual é grande), a participação de cada banco/corretora e a evolução mês a mês.
+3. **Dólar:** a cotação do dia é buscada sozinha (fonte: AwesomeAPI) e guardada no banco. Se a busca falhar, vale a última guardada, e dá para **Digitar** uma cotação.
+4. **De hoje × da época:** "de hoje" converte todos os saldos em dólar pela cotação atual; "da época" usa o dólar que valia quando cada saldo foi lançado.
+5. **Backup:** Ajustes → **Baixar backup (JSON)**. Faça depois de lançar o mês e guarde em local seguro.
+
+## Regras que o app segue
+
+- A **Filha** não aparece no Patrimônio nem entra na soma da Família (ela será usada só na tela de Ativos).
+- Se um banco **não for lançado** em um mês, vale o último valor informado (o app avisa quantos saldos estão assim). Para zerar uma conta, lance `0`.
+- Cada saldo guarda o câmbio do dia do lançamento; linhas já salvas mantêm esse câmbio, a menos que você marque "Reaplicar".

@@ -91,11 +91,9 @@ export default function Seguranca() {
 
   return (
     <section>
-      <h1 className="titulo-pagina">Segurança</h1>
-      <p className="muted">Conta: {email}</p>
-
       <div className="cartao">
         <h2>Verificação em duas etapas</h2>
+        <p className="muted">Conta: {email}</p>
 
         {fatorAtivoId && !inscricao && (
           <>
