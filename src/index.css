@@ -998,3 +998,86 @@ input[type='month'] {
     flex-basis: 100%;
   }
 }
+
+/* ===== Fase 2: ativos e rendimentos ===== */
+.grafico-leitura {
+  min-height: 1.4em;
+  margin: 0 0 0.25rem;
+  font-size: 0.9rem;
+  color: var(--cor-texto-suave);
+}
+.grafico svg.svg-largo,
+.grafico > svg {
+  width: 100%;
+  height: auto;
+}
+.grafico .coluna {
+  fill: var(--serie-1);
+  opacity: 0.85;
+}
+.grafico .coluna.ativa {
+  opacity: 1;
+}
+.resumo-resultado {
+  margin: 0.4rem 0 0;
+}
+.resultado.pos {
+  color: var(--cor-ok, #1a7f45);
+  font-weight: 600;
+}
+.resultado.neg {
+  color: var(--cor-erro, #b3261e);
+  font-weight: 600;
+}
+.lista-ativos,
+.lista-simples {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+}
+.ativo-linha {
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--grade);
+}
+.ativo-linha:first-child {
+  border-top: 0;
+}
+.ativo-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.ativo-ticker {
+  font-weight: 700;
+}
+.ativo-valor {
+  text-align: right;
+}
+.ativo-valor .valor-duplo {
+  align-items: flex-end;
+}
+.ativo-detalhe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+}
+.lista-simples li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--grade);
+  font-size: 0.95rem;
+}
+.lista-simples li:first-child {
+  border-top: 0;
+}
+.linha-com-botao {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}

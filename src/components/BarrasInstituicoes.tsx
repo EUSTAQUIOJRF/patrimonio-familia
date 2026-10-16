@@ -8,7 +8,15 @@ import type { Fatia } from '../lib/calculos'
  * Barras horizontais de uma cor só, ordenadas da maior para a menor. O nome vem escrito ao lado
  * de cada barra, então a identidade nunca depende de cor. A trilha clara mostra o "todo".
  */
-export default function BarrasInstituicoes({ fatias }: { fatias: Fatia[] }) {
+export default function BarrasInstituicoes({
+  fatias,
+  rotulo = 'Participação por banco ou corretora',
+  todo = 'do patrimônio',
+}: {
+  fatias: Fatia[]
+  rotulo?: string
+  todo?: string
+}) {
   const { moedaPrincipal } = usePreferencias()
   const principal: Moeda = moedaPrincipal
   const secundaria: Moeda = principal === 'BRL' ? 'USD' : 'BRL'
@@ -17,7 +25,7 @@ export default function BarrasInstituicoes({ fatias }: { fatias: Fatia[] }) {
   const valorDe = (f: Fatia, m: Moeda) => (m === 'BRL' ? f.brl : f.usd)
 
   return (
-    <ul className="barras" aria-label="Participação por banco ou corretora">
+    <ul className="barras" aria-label={rotulo}>
       {fatias.map((f) => (
         <li key={f.id} className="barras-linha">
           <div className="barras-nome" title={f.nome}>
@@ -26,7 +34,7 @@ export default function BarrasInstituicoes({ fatias }: { fatias: Fatia[] }) {
           <div
             className="barras-trilha"
             role="img"
-            aria-label={`${f.nome}: ${formatarPercentual(f.pct)} do patrimônio`}
+            aria-label={`${f.nome}: ${formatarPercentual(f.pct)} ${todo}`}
           >
             <div
               className="barras-preenchimento"

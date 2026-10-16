@@ -1,0 +1,24 @@
+name: Atualizar cotações
+
+on:
+  schedule:
+    # Todo dia às 00:30 UTC (21:30 em Brasília), depois do fechamento da B3 e de Nova York.
+    - cron: '30 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  cotacoes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Buscar preços e gravar no Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_CHAVE_PUBLICA: ${{ secrets.SUPABASE_CHAVE_PUBLICA }}
+          ROBO_EMAIL: ${{ secrets.ROBO_EMAIL }}
+          ROBO_SENHA: ${{ secrets.ROBO_SENHA }}
+        run: node scripts/atualizar-cotacoes.mjs

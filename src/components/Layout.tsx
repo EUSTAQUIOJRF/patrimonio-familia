@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { AtivosProvider } from '../contexts/AtivosContext'
 import { CambioProvider } from '../contexts/CambioContext'
 import { DadosProvider } from '../contexts/DadosContext'
 import { usePreferencias } from '../contexts/PreferenciasContext'
@@ -81,7 +82,9 @@ export default function Layout() {
         )}
         <DadosProvider>
           <CambioProvider>
-            <Outlet />
+            <AtivosProvider>
+              <Outlet />
+            </AtivosProvider>
           </CambioProvider>
         </DadosProvider>
         <footer className="rodape">Conectado como {email}</footer>

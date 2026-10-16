@@ -27,6 +27,3 @@ dist-ssr
 .env
 .env.*
 !.env.example
-
-*.zip
-*.docx

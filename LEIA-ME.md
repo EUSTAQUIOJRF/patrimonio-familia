@@ -1,4 +1,4 @@
-# Patrimônio Família — Fases 0 e 1
+# Patrimônio Família — Fases 0, 1 e 2
 
 Web-app (PWA) para acompanhar o patrimônio da família.
 
@@ -159,3 +159,41 @@ Para testar na hora: aba **Actions → Manter Supabase ativo → Run workflow**.
 - A **Filha** não aparece no Patrimônio nem entra na soma da Família (ela será usada só na tela de Ativos).
 - Se um banco **não for lançado** em um mês, vale o último valor informado (o app avisa quantos saldos estão assim). Para zerar uma conta, lance `0`.
 - Cada saldo guarda o câmbio do dia do lançamento; linhas já salvas mantêm esse câmbio, a menos que você marque "Reaplicar".
+
+
+---
+
+# Fase 2 — Ativos e Rendimentos
+
+Novas telas: **Ativos** (carteira de cada pessoa e da família, com preço atual, resultado e participação por tipo; a Filha aparece só como "monitor", fora da soma) e **Rendimentos** (dividendos, JCP e rendimentos de FIIs lançados à mão, com gráfico dos últimos 12 meses, total por ativo, por ano e média anual).
+
+## Passo D — Banco: rodar o SQL novo
+**SQL Editor → New query**, cole `supabase/03_fase2.sql` e **Run**. Devem surgir as tabelas `ativos`, `posicoes`, `cotacoes`, `proventos`.
+
+## Passo E — Publicar o código
+Na pasta do projeto (PowerShell):
+```powershell
+Expand-Archive -Path "CAMINHO\patrimonio-familia-fase2.zip" -DestinationPath "." -Force
+git add .
+git status --short      # confira que .env.local NÃO aparece
+git commit -m "Fase 2: ativos e rendimentos"
+git push
+```
+
+## Passo F — Preços automáticos toda noite (GitHub Actions)
+A rotina `.github/workflows/atualizar-cotacoes.yml` busca os preços (fonte: Yahoo Finance, sem chave) todo dia às 21:30 de Brasília e grava no banco. Ela entra no Supabase como um **usuário "robô"** comum, sem usar chave secreta.
+
+1. Supabase → **Authentication → Users → Add user**: e-mail `robo@exemplo.com` (qualquer e-mail seu/fictício), senha forte, confirmar e-mail automaticamente.
+2. GitHub → repositório → **Settings → Secrets and variables → Actions** e crie 4 secrets: `SUPABASE_URL`, `SUPABASE_CHAVE_PUBLICA` (as mesmas do Passo C da Fase 1), `ROBO_EMAIL`, `ROBO_SENHA`.
+3. Aba **Actions → Atualizar cotações → Run workflow**. Deve ficar verde e o log lista cada ativo ("OK PETR4 = ...").
+4. Se um ativo falhar (fica vermelho), em geral é o código de busca: edite o ativo na tela Ativos → **Editar → Código para buscar o preço** (ex.: `PETR4.SA`, `AAPL`, `BTC-USD`).
+
+> Não pude testar a fonte de preços daqui (sem acesso à internet externa); por isso o passo 3 é o teste real. A leitura da resposta está coberta por testes. Se o Yahoo bloquear o GitHub, avise: trocamos por outra fonte (ex.: brapi.dev), mexendo só no script.
+> Enquanto o primeiro preço não chega, você pode digitar o **Preço atual** ao cadastrar o ativo; até lá o ativo vale pelo preço médio e aparece "sem preço".
+
+## Como usar
+- **Ativos → escolha a pessoa → Adicionar ativo:** informe código (PETR4, XPML11, AAPL, BTC), tipo, quantidade e preço médio (na moeda do ativo). O código de busca é preenchido sozinho. Para ajustar uma posição use **Editar**.
+- Tipos: Ação, FII, ETF, BDR, Exterior (EUA) e Cripto. Exterior e cripto vêm em US$.
+- **Rendimentos → Lançar provento:** pessoa, ativo, mês, tipo, valor líquido. Dólar convertido pelo câmbio do dia do lançamento.
+- **Média anual:** total ÷ tempo de histórico (mínimo 12 meses, para não inflar a média no começo).
+- Valores em dólar usam a cotação de hoje nas telas de Ativos.
