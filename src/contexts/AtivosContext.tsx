@@ -9,7 +9,7 @@ import {
 } from 'react'
 import { supabase } from '../lib/supabase'
 import { traduzirErroAuth, type Moeda } from '../lib/formato'
-import type { Ativo, ClasseAtivo, Cotacao, Posicao, Provento, TipoProvento } from '../lib/tipos'
+import type { Ativo, ClasseAtivo, Cotacao, Favorito, Posicao, Provento, TipoProvento } from '../lib/tipos'
 
 interface AtivosContexto {
   ativos: Ativo[]
@@ -17,6 +17,9 @@ interface AtivosContexto {
   /** Último preço de cada ativo, por id do ativo. */
   cotacoes: Map<string, Cotacao>
   proventos: Provento[]
+  favoritos: Favorito[]
+  /** Aviso se a tabela de favoritos ainda não existe (Fase 3 não instalada). */
+  avisoFavoritos: string | null
   carregando: boolean
   erro: string | null
   recarregar: () => Promise<void>
@@ -58,12 +61,14 @@ export function AtivosProvider({ children }: { children: ReactNode }) {
   const [posicoes, setPosicoes] = useState<Posicao[]>([])
   const [cotacoes, setCotacoes] = useState<Map<string, Cotacao>>(new Map())
   const [proventos, setProventos] = useState<Provento[]>([])
+  const [favoritos, setFavoritos] = useState<Favorito[]>([])
+  const [avisoFavoritos, setAvisoFavoritos] = useState<string | null>(null)
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
 
   const recarregar = useCallback(async () => {
     try {
-      const [a, p, c, pr] = await Promise.all([
+      const [a, p, c, pr, fav] = await Promise.all([
         supabase
           .from('ativos')
           .select('id, ticker, nome, classe, moeda, simbolo_cotacao, ativo')
@@ -71,6 +76,7 @@ export function AtivosProvider({ children }: { children: ReactNode }) {
         supabase.from('posicoes').select('id, pessoa_id, ativo_id, quantidade, preco_medio'),
         supabase.from('cotacoes_ultimas').select('ativo_id, data, preco, fonte'),
         buscarProventos(),
+        supabase.from('favoritos').select('ativo_id, ordem').order('ordem'),
       ])
       if (a.error) throw new Error(a.error.message)
       if (p.error) throw new Error(p.error.message)
@@ -109,6 +115,16 @@ export function AtivosProvider({ children }: { children: ReactNode }) {
         ),
       )
       setProventos(pr)
+      // Favoritos são da Fase 3: se a tabela ainda não existe, o resto do app continua funcionando.
+      if (fav.error) {
+        setFavoritos([])
+        setAvisoFavoritos(
+          'A tabela de favoritos ainda não existe. Rode o arquivo supabase/04_fase3.sql no SQL Editor do Supabase.',
+        )
+      } else {
+        setFavoritos(fav.data.map((r) => ({ ativo_id: r.ativo_id as string, ordem: Number(r.ordem) })))
+        setAvisoFavoritos(null)
+      }
       setErro(null)
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e)
@@ -128,8 +144,8 @@ export function AtivosProvider({ children }: { children: ReactNode }) {
   }, [recarregar])
 
   const valor = useMemo(
-    () => ({ ativos, posicoes, cotacoes, proventos, carregando, erro, recarregar }),
-    [ativos, posicoes, cotacoes, proventos, carregando, erro, recarregar],
+    () => ({ ativos, posicoes, cotacoes, proventos, favoritos, avisoFavoritos, carregando, erro, recarregar }),
+    [ativos, posicoes, cotacoes, proventos, favoritos, avisoFavoritos, carregando, erro, recarregar],
   )
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>
 }

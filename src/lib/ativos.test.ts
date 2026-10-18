@@ -127,3 +127,21 @@ test('por ativo: filtra o ano e traz a média de cada um', () => {
   const todos = porAtivoProvento(provs, ativos, '2026-10-01', null)
   assert.equal(todos[0].brl, 300)
 })
+
+import { formatarVariacao, tempoRelativo } from './apresentacao.ts'
+
+test('tempo relativo das notícias', () => {
+  const agora = Date.parse('2026-10-18T12:00:00Z')
+  assert.equal(tempoRelativo('2026-10-18T11:59:40Z', agora), 'agora')
+  assert.equal(tempoRelativo('2026-10-18T11:30:00Z', agora), 'há 30 min')
+  assert.equal(tempoRelativo('2026-10-18T09:00:00Z', agora), 'há 3 h')
+  assert.equal(tempoRelativo('2026-10-16T12:00:00Z', agora), 'há 2 dias')
+  assert.equal(tempoRelativo(null, agora), '')
+  assert.equal(tempoRelativo('lixo', agora), '')
+})
+
+test('variação formatada com seta e sinal', () => {
+  assert.equal(formatarVariacao(1.234), '▲ +1,23%')
+  assert.equal(formatarVariacao(-0.5), '▼ -0,50%')
+  assert.equal(formatarVariacao(0), '0,00%')
+})

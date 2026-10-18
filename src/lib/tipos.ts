@@ -76,3 +76,9 @@ export interface Provento {
   cambio_usd_brl: number
   observacao: string | null
 }
+
+/** Ativo marcado como favorito (acompanhado na tela Favoritos). */
+export interface Favorito {
+  ativo_id: string
+  ordem: number
+}

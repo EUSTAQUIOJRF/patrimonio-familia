@@ -9,6 +9,7 @@ import EsqueciSenha from './pages/EsqueciSenha'
 import Ajustes from './pages/Ajustes'
 import Ativos from './pages/Ativos'
 import Rendimentos from './pages/Rendimentos'
+import Favoritos from './pages/Favoritos'
 import Lancar from './pages/Lancar'
 import Patrimonio from './pages/Patrimonio'
 import Login from './pages/Login'
@@ -46,7 +47,7 @@ function Porteiro() {
         <Route path="lancar" element={<Lancar />} />
         <Route path="ativos" element={<Ativos />} />
         <Route path="rendimentos" element={<Rendimentos />} />
-        <Route path="favoritos" element={<EmBreve titulo="Favoritos e notícias" fase="Fase 3" />} />
+        <Route path="favoritos" element={<Favoritos />} />
         <Route path="metas" element={<EmBreve titulo="Metas" fase="Fase 4" />} />
         <Route path="comparar" element={<EmBreve titulo="Comparar ativos" fase="Fase 5" />} />
         <Route path="ajustes" element={<Ajustes />} />

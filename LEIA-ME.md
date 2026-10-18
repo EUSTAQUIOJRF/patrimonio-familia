@@ -1,4 +1,4 @@
-# Patrimônio Família — Fases 0, 1 e 2
+# Patrimônio Família — Fases 0 a 3
 
 Web-app (PWA) para acompanhar o patrimônio da família.
 
@@ -197,3 +197,39 @@ A rotina `.github/workflows/atualizar-cotacoes.yml` busca os preços (fonte: Yah
 - **Rendimentos → Lançar provento:** pessoa, ativo, mês, tipo, valor líquido. Dólar convertido pelo câmbio do dia do lançamento.
 - **Média anual:** total ÷ tempo de histórico (mínimo 12 meses, para não inflar a média no começo).
 - Valores em dólar usam a cotação de hoje nas telas de Ativos.
+
+
+---
+
+# Fase 3 — Favoritos, cotações ao vivo e notícias
+
+A tela **Favoritos** mostra os ativos que você quer acompanhar (tenha ou não na carteira), com preço atualizado a cada minuto, variação do dia, mini-gráfico do último mês e **notícias**. Cada notícia traz uma etiqueta e uma faixa de cor: **Brasil** (verde, imprensa brasileira) ou **Exterior** (roxo, imprensa estrangeira). Dá para filtrar por imprensa e por ativo.
+
+## Passo G — Banco
+**SQL Editor → New query**, cole `supabase/04_fase3.sql` e **Run** (cria a tabela `favoritos`).
+
+## Passo H — Publicar o código
+Na pasta do projeto (Mac, no Terminal):
+```bash
+cd ~/Documents/patrimonio-familia
+unzip -o ~/Downloads/patrimonio-familia-fase3.zip
+git add .
+git status --short
+git commit -m "Fase 3: favoritos, cotações ao vivo e notícias"
+git push
+```
+(No Windows: `Expand-Archive -Path "$HOME\Downloads\patrimonio-familia-fase3.zip" -DestinationPath "." -Force`.)
+
+A Netlify publica o site **e duas funções** novas (`cotacao` e `noticias`, em `netlify/functions`). Elas consultam o Yahoo Finanças e o Google Notícias, porque o navegador não pode consultar esses sites diretamente. Só respondem a quem está logado no app. Não há chave nem custo extra.
+
+Confira na Netlify: **Logs → Functions** deve listar `cotacao` e `noticias`. As variáveis `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` que você já criou também são usadas por elas para validar o login.
+
+## Como usar
+- **Favoritos → Adicionar favorito:** escolha um ativo que já existe ou **＋ Novo ativo** (ex.: WEGE3, MSFT, ETH). O código de busca é preenchido sozinho e pode ser corrigido.
+- Os favoritos também entram na atualização noturna de preços (Fase 2).
+- Se a busca ao vivo falhar, a linha mostra o último preço salvo, com a data.
+- Cotações da B3 no Yahoo podem ter atraso de cerca de 15 minutos.
+
+## Limites conhecidos
+- Não pude testar as fontes de preço e de notícias daqui (sem internet externa); a leitura das respostas é coberta por testes, mas a primeira execução real é a sua. Se as notícias não aparecerem, me envie a mensagem que a tela mostrar.
+- Google Notícias e Yahoo são fontes gratuitas sem garantia; podem mudar ou limitar. O app avisa quando falham, e o resto continua funcionando.
