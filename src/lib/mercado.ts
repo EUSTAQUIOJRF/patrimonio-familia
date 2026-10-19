@@ -89,3 +89,15 @@ export async function buscarComparacao(
   })
   return r.itens
 }
+
+export interface ResultadoBusca {
+  simbolo: string
+  nome: string
+  tipo: string
+  bolsa: string
+}
+
+export async function buscarAtivos(texto: string): Promise<ResultadoBusca[]> {
+  const r = await chamar<{ resultados: ResultadoBusca[] }>('buscar', { q: texto })
+  return r.resultados
+}

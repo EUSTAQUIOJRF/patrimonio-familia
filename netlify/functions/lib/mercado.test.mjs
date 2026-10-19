@@ -96,3 +96,23 @@ test('endereços de notícias por região', () => {
   assert.ok(urlsNoticias('PETR4.SA', 'BR')[0].includes('q=PETR4%20when'))
   assert.equal(urlsNoticias('AAPL', 'EXT').length, 2)
 })
+
+import { lerBusca, urlBusca } from './mercado.mjs'
+
+test('busca: filtra tipos, símbolos inválidos e limita', () => {
+  const r = lerBusca({
+    quotes: [
+      { symbol: 'PETR4.SA', shortname: 'PETROBRAS PN', quoteType: 'EQUITY', exchDisp: 'São Paulo' },
+      { symbol: '^BVSP', shortname: 'IBOVESPA', quoteType: 'INDEX' },
+      { symbol: 'BOVA11.SA', longname: 'iShares Ibovespa &amp; Co', quoteType: 'ETF', exchange: 'SAO' },
+      { symbol: 'BTC-USD', shortname: 'Bitcoin USD', quoteType: 'CRYPTOCURRENCY' },
+      { symbol: '<x>', shortname: 'ruim', quoteType: 'EQUITY' },
+      { symbol: 'XYZ', shortname: 'opção', quoteType: 'OPTION' },
+    ],
+  })
+  assert.deepEqual(r.map((x) => x.simbolo), ['PETR4.SA', 'BOVA11.SA', 'BTC-USD'])
+  assert.equal(r[1].nome, 'iShares Ibovespa & Co')
+  assert.equal(lerBusca({}).length, 0)
+  assert.equal(lerBusca({ quotes: Array.from({ length: 20 }, (_, i) => ({ symbol: `A${i}`, quoteType: 'EQUITY' })) }, 5).length, 5)
+  assert.match(urlBusca('banco do brasil'), /q=banco%20do%20brasil/)
+})

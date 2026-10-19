@@ -301,3 +301,10 @@ De onde vêm os indicadores:
 - O Fundamentus é uma fonte não oficial; use com moderação (cada comparação faz 1 consulta por ativo).
 - Indicadores de ações e FIIs são diferentes entre si; comparar os dois tipos é limitado.
 - Os dados podem ter atraso ou erro. Confirme antes de decidir qualquer coisa.
+
+## Atualização: procurar qualquer ativo na tela Comparar
+
+Não precisa rodar SQL. Na tela **Comparar** há agora o cartão **Procurar outro ativo**: digite um nome ou código
+(ex.: "banco do brasil", WEGE3, MSFT, BTC), toque em **Buscar** e em **Adicionar**. O ativo entra só na comparação
+(aparece como "da busca" e pode ser tirado com o ×); não vai para a sua carteira. Se a busca falhar, o botão
+"Usar o código digitado" aceita o código direto. Basta fazer o push; o Netlify publica a nova função `buscar`.

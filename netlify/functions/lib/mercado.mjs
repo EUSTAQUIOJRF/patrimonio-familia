@@ -164,3 +164,28 @@ export const URLS_GERAIS = {
     `https://news.google.com/rss/search?q=${encodeURIComponent('"stock market" OR "Wall Street" when:2d')}&hl=en-US&gl=US&ceid=US:en`,
   ],
 }
+
+const TIPOS_BUSCA = new Set(['EQUITY', 'ETF', 'CRYPTOCURRENCY', 'MUTUALFUND', 'INDEX'])
+
+/** Lê a resposta da busca do Yahoo: [{ simbolo, nome, tipo, bolsa }] só de ativos que fazem sentido comparar. */
+export function lerBusca(json, max = 8) {
+  const lista = Array.isArray(json?.quotes) ? json.quotes : []
+  const saida = []
+  for (const q of lista) {
+    const simbolo = String(q?.symbol ?? '')
+    const tipo = String(q?.quoteType ?? '').toUpperCase()
+    if (!SIMBOLO_OK.test(simbolo) || !TIPOS_BUSCA.has(tipo) || tipo === 'INDEX') continue
+    saida.push({
+      simbolo,
+      nome: limparTexto(q.longname || q.shortname || ''),
+      tipo,
+      bolsa: limparTexto(q.exchDisp || q.exchange || ''),
+    })
+    if (saida.length >= max) break
+  }
+  return saida
+}
+
+export function urlBusca(texto) {
+  return `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(texto)}&quotesCount=10&newsCount=0&lang=pt-BR&region=BR`
+}

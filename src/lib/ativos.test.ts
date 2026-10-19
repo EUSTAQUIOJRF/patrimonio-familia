@@ -179,3 +179,21 @@ test('base 100 e espalhamento de rótulos', () => {
   const baixo = espalharRotulos([219, 220, 221], 12, 10, 225)
   assert.ok(Math.max(...baixo) <= 225)
 })
+
+import { candidatoDeResultado, candidatoDeTexto } from './busca.ts'
+
+test('busca: classe e moeda prováveis de cada resultado', () => {
+  assert.deepEqual(candidatoDeResultado('PETR4.SA', 'EQUITY'), { ticker: 'PETR4', classe: 'acao', moeda: 'BRL', simbolo_cotacao: 'PETR4.SA' })
+  assert.equal(candidatoDeResultado('XPML11.SA', 'EQUITY').classe, 'fii')
+  assert.equal(candidatoDeResultado('BOVA11.SA', 'ETF').classe, 'etf')
+  assert.deepEqual(candidatoDeResultado('AAPL', 'EQUITY'), { ticker: 'AAPL', classe: 'exterior', moeda: 'USD', simbolo_cotacao: 'AAPL' })
+  assert.deepEqual(candidatoDeResultado('BTC-USD', 'CRYPTOCURRENCY'), { ticker: 'BTC', classe: 'cripto', moeda: 'USD', simbolo_cotacao: 'BTC-USD' })
+})
+
+test('busca: texto digitado vira candidato; lixo é recusado', () => {
+  assert.equal(candidatoDeTexto('wege3')?.simbolo_cotacao, 'WEGE3.SA')
+  assert.equal(candidatoDeTexto('msft')?.classe, 'exterior')
+  assert.equal(candidatoDeTexto('eth')?.simbolo_cotacao, 'ETH-USD')
+  assert.equal(candidatoDeTexto('bitcoin é legal'), null)
+  assert.equal(candidatoDeTexto(''), null)
+})

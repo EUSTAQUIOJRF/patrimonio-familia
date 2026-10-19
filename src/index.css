@@ -1349,3 +1349,27 @@ table.comparativo td.melhor {
 .estrela {
   color: var(--cor-texto);
 }
+
+.chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+.chip-remover {
+  border: 0;
+  background: transparent;
+  color: var(--cor-texto-suave);
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0.25rem 0.4rem;
+  cursor: pointer;
+}
+.busca-linha {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+.busca-linha input {
+  flex: 1;
+  min-width: 0;
+}
