@@ -90,5 +90,8 @@ if (linhas.length > 0) {
 }
 if (falhas.length > 0) {
   console.error(`Sem preço para: ${falhas.join(', ')}`)
-  process.exit(1) // deixa a execução vermelha no GitHub para você notar
+  // Falha parcial (um código errado, um ativo deslistado) vira só um aviso amarelo no GitHub.
+  // A execução só fica vermelha (e manda e-mail) se nada foi gravado ou se mais da metade falhou.
+  if (linhas.length === 0 || falhas.length > lista.length / 2) process.exit(1)
+  console.log(`::warning::Sem preço para: ${falhas.join(', ')}. Confira o código de cotação na tela Ativos.`)
 }
