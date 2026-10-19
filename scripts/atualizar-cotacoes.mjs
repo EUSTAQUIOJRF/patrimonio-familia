@@ -48,7 +48,7 @@ const cab = {
 }
 
 const lista = await (
-  await buscarComTentativas(`${base}/rest/v1/ativos?select=id,ticker,moeda,simbolo_cotacao&ativo=eq.true`, {
+  await buscarComTentativas(`${base}/rest/v1/ativos?select=id,ticker,moeda,simbolo_cotacao&ativo=eq.true&classe=not.in.(renda_fixa,tesouro)`, {
     headers: cab,
   })
 ).json()

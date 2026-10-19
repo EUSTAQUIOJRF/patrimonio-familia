@@ -2,15 +2,32 @@ import type { Fatia, Totais } from './calculos.ts'
 import type { Ativo, ClasseAtivo, Cotacao, Posicao } from './tipos.ts'
 import type { Moeda } from './formato.ts'
 
-export const CLASSES: ClasseAtivo[] = ['acao', 'fii', 'etf', 'bdr', 'exterior', 'cripto']
+export const CLASSES: ClasseAtivo[] = [
+  'acao',
+  'fii',
+  'etf',
+  'bdr',
+  'stock',
+  'etf_ext',
+  'reit',
+  'adr',
+  'cripto',
+  'renda_fixa',
+  'tesouro',
+]
 
 export const ROTULO_CLASSE: Record<ClasseAtivo, string> = {
   acao: 'Ações',
   fii: 'FIIs',
   etf: 'ETFs',
   bdr: 'BDRs',
-  exterior: 'Exterior (EUA)',
+  stock: 'Stocks',
+  etf_ext: 'ETFs exterior',
+  reit: 'REITs',
+  adr: 'ADRs',
   cripto: 'Cripto',
+  renda_fixa: 'Renda fixa',
+  tesouro: 'Tesouro Direto',
 }
 
 export const ROTULO_CLASSE_UM: Record<ClasseAtivo, string> = {
@@ -18,20 +35,36 @@ export const ROTULO_CLASSE_UM: Record<ClasseAtivo, string> = {
   fii: 'FII',
   etf: 'ETF',
   bdr: 'BDR',
-  exterior: 'Exterior',
+  stock: 'Stock',
+  etf_ext: 'ETF exterior',
+  reit: 'REIT',
+  adr: 'ADR',
   cripto: 'Cripto',
+  renda_fixa: 'Renda fixa',
+  tesouro: 'Tesouro Direto',
 }
+
+const EM_DOLAR: readonly ClasseAtivo[] = ['stock', 'etf_ext', 'reit', 'adr', 'cripto']
+
+/** Classes sem cotação automática: o valor atual é digitado à mão. */
+export function ehManual(classe: ClasseAtivo): boolean {
+  return classe === 'renda_fixa' || classe === 'tesouro'
+}
+
+/** Código guardado nos ativos de preço manual (não é buscado em lugar nenhum). */
+export const SIMBOLO_MANUAL = 'MANUAL'
 
 /** Moeda mais provável de cada classe. */
 export function moedaPadrao(classe: ClasseAtivo): Moeda {
-  return classe === 'exterior' || classe === 'cripto' ? 'USD' : 'BRL'
+  return EM_DOLAR.includes(classe) ? 'USD' : 'BRL'
 }
 
 /** Código de busca de preço (estilo Yahoo Finance) a partir do ticker e da classe. */
 export function simboloPadrao(ticker: string, classe: ClasseAtivo): string {
   const t = ticker.trim().toUpperCase()
+  if (ehManual(classe)) return SIMBOLO_MANUAL
   if (classe === 'cripto') return t.includes('-') ? t : `${t}-USD`
-  if (classe === 'exterior') return t
+  if (moedaPadrao(classe) === 'USD') return t
   return t.endsWith('.SA') ? t : `${t}.SA`
 }
 

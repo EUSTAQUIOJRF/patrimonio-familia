@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import GraficoComparacao, { type SerieComparada } from '../components/GraficoComparacao'
 import { useAtivos } from '../contexts/AtivosContext'
-import { ROTULO_CLASSE_UM } from '../lib/ativos'
+import { ehManual, ROTULO_CLASSE_UM } from '../lib/ativos'
 import { candidatoDeResultado, candidatoDeTexto, type Candidato } from '../lib/busca'
 import { formatarMoeda, type Moeda } from '../lib/formato'
 import {
@@ -80,7 +80,8 @@ export default function Comparar() {
 
   const ordenados = useMemo<Opcao[]>(() => {
     const fav = new Set(favoritos.map((f) => f.ativo_id))
-    const proprios = [...ativos]
+    const proprios = ativos
+      .filter((a) => !ehManual(a.classe))
       .sort((a, b) => Number(fav.has(b.id)) - Number(fav.has(a.id)) || a.ticker.localeCompare(b.ticker))
       .map((a) => ({ id: a.id, ticker: a.ticker, classe: a.classe, moeda: a.moeda, simbolo_cotacao: a.simbolo_cotacao, extra: false }))
     const codigos = new Set(proprios.map((a) => a.simbolo_cotacao))

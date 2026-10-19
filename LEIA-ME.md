@@ -308,3 +308,12 @@ Não precisa rodar SQL. Na tela **Comparar** há agora o cartão **Procurar outr
 (ex.: "banco do brasil", WEGE3, MSFT, BTC), toque em **Buscar** e em **Adicionar**. O ativo entra só na comparação
 (aparece como "da busca" e pode ser tirado com o ×); não vai para a sua carteira. Se a busca falhar, o botão
 "Usar o código digitado" aceita o código direto. Basta fazer o push; o Netlify publica a nova função `buscar`.
+
+## Atualização: novos tipos de ativo
+
+Tipos agora disponíveis em Ativos e Favoritos: Ação, FII, ETF, BDR, **Stock, ETF exterior, REIT, ADR** (em dólar),
+Cripto, **Renda fixa e Tesouro Direto** (em reais, sem cotação automática: você digita o "valor atual de 1 unidade").
+
+**Passo obrigatório (uma vez):** no Supabase, SQL Editor → New query → colar o conteúdo de `supabase/06_classes.sql` → Run.
+Ele libera os novos tipos e troca o antigo tipo "Exterior" por "Stock" nos ativos que você já tinha.
+Depois faça o push normalmente.

@@ -30,7 +30,18 @@ export interface Saldo {
   observacao: string | null
 }
 
-export type ClasseAtivo = 'acao' | 'etf' | 'bdr' | 'fii' | 'cripto' | 'exterior'
+export type ClasseAtivo =
+  | 'acao'
+  | 'etf'
+  | 'bdr'
+  | 'fii'
+  | 'cripto'
+  | 'stock'
+  | 'etf_ext'
+  | 'reit'
+  | 'adr'
+  | 'renda_fixa'
+  | 'tesouro'
 
 export interface Ativo {
   id: string

@@ -80,7 +80,7 @@ test('papel do Fundamentus e escolha da fonte por tipo', () => {
   assert.equal(papelFundamentus('../etc'), null)
   assert.equal(fonteFundamentos('acao'), 'fundamentus')
   assert.equal(fonteFundamentos('fii'), 'fundamentus')
-  assert.equal(fonteFundamentos('exterior'), 'finnhub')
+  assert.equal(fonteFundamentos('stock'), 'finnhub')
   assert.equal(fonteFundamentos('cripto'), null)
 })
 

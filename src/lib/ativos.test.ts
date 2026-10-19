@@ -3,6 +3,8 @@ import { test } from 'node:test'
 import {
   carteira,
   diasEntre,
+  ehManual,
+  moedaPadrao,
   porClasse,
   simboloPadrao,
 } from './ativos.ts'
@@ -18,7 +20,7 @@ import type { Ativo, Cotacao, Posicao, Provento } from './tipos.ts'
 
 const ativos: Ativo[] = [
   { id: 'petr', ticker: 'PETR4', nome: null, classe: 'acao', moeda: 'BRL', simbolo_cotacao: 'PETR4.SA', ativo: true },
-  { id: 'aapl', ticker: 'AAPL', nome: null, classe: 'exterior', moeda: 'USD', simbolo_cotacao: 'AAPL', ativo: true },
+  { id: 'aapl', ticker: 'AAPL', nome: null, classe: 'stock', moeda: 'USD', simbolo_cotacao: 'AAPL', ativo: true },
   { id: 'xpml', ticker: 'XPML11', nome: null, classe: 'fii', moeda: 'BRL', simbolo_cotacao: 'XPML11.SA', ativo: true },
 ]
 const posicoes: Posicao[] = [
@@ -36,7 +38,7 @@ const cot = new Map<string, Cotacao>([
 test('símbolo de cotação por classe', () => {
   assert.equal(simboloPadrao('petr4', 'acao'), 'PETR4.SA')
   assert.equal(simboloPadrao('XPML11.SA', 'fii'), 'XPML11.SA')
-  assert.equal(simboloPadrao('aapl', 'exterior'), 'AAPL')
+  assert.equal(simboloPadrao('aapl', 'stock'), 'AAPL')
   assert.equal(simboloPadrao('btc', 'cripto'), 'BTC-USD')
 })
 
@@ -186,14 +188,28 @@ test('busca: classe e moeda prováveis de cada resultado', () => {
   assert.deepEqual(candidatoDeResultado('PETR4.SA', 'EQUITY'), { ticker: 'PETR4', classe: 'acao', moeda: 'BRL', simbolo_cotacao: 'PETR4.SA' })
   assert.equal(candidatoDeResultado('XPML11.SA', 'EQUITY').classe, 'fii')
   assert.equal(candidatoDeResultado('BOVA11.SA', 'ETF').classe, 'etf')
-  assert.deepEqual(candidatoDeResultado('AAPL', 'EQUITY'), { ticker: 'AAPL', classe: 'exterior', moeda: 'USD', simbolo_cotacao: 'AAPL' })
+  assert.deepEqual(candidatoDeResultado('AAPL', 'EQUITY'), { ticker: 'AAPL', classe: 'stock', moeda: 'USD', simbolo_cotacao: 'AAPL' })
   assert.deepEqual(candidatoDeResultado('BTC-USD', 'CRYPTOCURRENCY'), { ticker: 'BTC', classe: 'cripto', moeda: 'USD', simbolo_cotacao: 'BTC-USD' })
 })
 
 test('busca: texto digitado vira candidato; lixo é recusado', () => {
   assert.equal(candidatoDeTexto('wege3')?.simbolo_cotacao, 'WEGE3.SA')
-  assert.equal(candidatoDeTexto('msft')?.classe, 'exterior')
+  assert.equal(candidatoDeTexto('msft')?.classe, 'stock')
   assert.equal(candidatoDeTexto('eth')?.simbolo_cotacao, 'ETH-USD')
   assert.equal(candidatoDeTexto('bitcoin é legal'), null)
   assert.equal(candidatoDeTexto(''), null)
+})
+
+test('novas classes: moeda, símbolo e preço manual', () => {
+  for (const c of ['stock', 'etf_ext', 'reit', 'adr'] as const) {
+    assert.equal(moedaPadrao(c), 'USD')
+    assert.equal(simboloPadrao('o', c), 'O')
+    assert.equal(ehManual(c), false)
+  }
+  for (const c of ['renda_fixa', 'tesouro'] as const) {
+    assert.equal(moedaPadrao(c), 'BRL')
+    assert.equal(simboloPadrao('CDB Banco X', c), 'MANUAL')
+    assert.equal(ehManual(c), true)
+  }
+  assert.equal(candidatoDeResultado('VOO', 'ETF').classe, 'etf_ext')
 })

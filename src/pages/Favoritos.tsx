@@ -4,6 +4,7 @@ import { useAtivos } from '../contexts/AtivosContext'
 import {
   CLASSES,
   ROTULO_CLASSE_UM,
+  ehManual,
   moedaPadrao,
   simboloPadrao,
 } from '../lib/ativos'
@@ -33,7 +34,7 @@ export default function Favoritos() {
       return a ? [a] : []
     })
   }, [ativos, favoritos])
-  const simbolos = useMemo(() => lista.map((a) => a.simbolo_cotacao), [lista])
+  const simbolos = useMemo(() => lista.filter((a) => !ehManual(a.classe)).map((a) => a.simbolo_cotacao), [lista])
   const vivo = useCotacoesAoVivo(simbolos)
 
   // ---- adicionar favorito
@@ -47,7 +48,7 @@ export default function Favoritos() {
   const [salvando, setSalvando] = useState(false)
 
   const jaFavoritos = useMemo(() => new Set(favoritos.map((f) => f.ativo_id)), [favoritos])
-  const disponiveis = ativos.filter((a) => !jaFavoritos.has(a.id))
+  const disponiveis = ativos.filter((a) => !jaFavoritos.has(a.id) && !ehManual(a.classe))
   const simboloAuto = simboloPadrao(ticker || 'TICKER', classe)
 
   async function adicionar(e: FormEvent) {
@@ -279,7 +280,7 @@ export default function Favoritos() {
                   setMoeda(moedaPadrao(c))
                 }}
               >
-                {CLASSES.map((c) => (
+                {CLASSES.filter((c) => !ehManual(c)).map((c) => (
                   <option key={c} value={c}>
                     {ROTULO_CLASSE_UM[c]}
                   </option>

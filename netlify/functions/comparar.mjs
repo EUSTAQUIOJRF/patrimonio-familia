@@ -1,4 +1,4 @@
-// Dados para o comparador. GET /.netlify/functions/comparar?i=PETR4.SA|acao,VALE3.SA|acao,AAPL|exterior
+// Dados para o comparador. GET /.netlify/functions/comparar?i=PETR4.SA|acao,VALE3.SA|acao,AAPL|stock
 // Devolve, para cada item: desempenho do preço em 12 meses e indicadores fundamentalistas (quando existirem).
 import { exigirLogin, json } from './lib/auth.mjs'
 import {
@@ -9,7 +9,7 @@ import {
   papelFundamentus,
 } from './lib/fundamentos.mjs'
 
-const CLASSES = new Set(['acao', 'etf', 'bdr', 'fii', 'cripto', 'exterior'])
+const CLASSES = new Set(['acao', 'etf', 'bdr', 'fii', 'cripto', 'stock', 'etf_ext', 'reit', 'adr'])
 const SIMBOLO_OK = /^[A-Za-z0-9.\-=^]{1,20}$/
 const UA = 'Mozilla/5.0 (compatible; patrimonio-familia)'
 

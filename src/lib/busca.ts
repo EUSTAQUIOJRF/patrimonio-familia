@@ -17,8 +17,8 @@ export function candidatoDeResultado(simbolo: string, tipo: string): Candidato {
   let classe: ClasseAtivo
   if (tipo === 'CRYPTOCURRENCY') classe = 'cripto'
   else if (br) classe = tipo === 'ETF' ? 'etf' : /11$/.test(ticker) ? 'fii' : 'acao'
-  else classe = 'exterior'
-  const moeda: Moeda = br ? 'BRL' : classe === 'cripto' || classe === 'exterior' ? 'USD' : moedaPadrao(classe)
+  else classe = tipo === 'ETF' ? 'etf_ext' : 'stock'
+  const moeda: Moeda = moedaPadrao(classe)
   return { ticker, classe, moeda, simbolo_cotacao: s }
 }
 

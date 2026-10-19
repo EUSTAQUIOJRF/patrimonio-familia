@@ -11,6 +11,7 @@ import {
   ROTULO_CLASSE_UM,
   carteira,
   diasEntre,
+  ehManual,
   moedaPadrao,
   porAtivoCarteira,
   porClasse,
@@ -67,6 +68,8 @@ function FormPosicao({ pessoaId, pessoaNome, ativoInicial, onFim }: PropsForm) {
   const novo = ativoId === NOVO
   const simboloAuto = novo ? simboloPadrao(ticker || 'TICKER', classe) : ''
   const moedaAtivo: Moeda = novo ? moeda : (existente?.moeda ?? 'BRL')
+  const classeAtivo: ClasseAtivo = novo ? classe : (existente?.classe ?? 'acao')
+  const manual = ehManual(classeAtivo)
   const simboloAtual = novo
     ? simboloMexido
       ? simbolo
@@ -197,6 +200,7 @@ function FormPosicao({ pessoaId, pessoaNome, ativoInicial, onFim }: PropsForm) {
                 const c = e.target.value as ClasseAtivo
                 setClasse(c)
                 setMoeda(moedaPadrao(c))
+                setSimboloMexido(false)
               }}
             >
               {CLASSES.map((c) => (
@@ -244,7 +248,7 @@ function FormPosicao({ pessoaId, pessoaNome, ativoInicial, onFim }: PropsForm) {
               />
             </label>
             <label className="controle">
-              <span className="controle-rotulo">Preço atual (opcional)</span>
+              <span className="controle-rotulo">{manual ? 'Valor atual de 1 unidade' : 'Preço atual (opcional)'}</span>
               <input
                 type="text"
                 inputMode="decimal"
@@ -253,22 +257,32 @@ function FormPosicao({ pessoaId, pessoaNome, ativoInicial, onFim }: PropsForm) {
                 placeholder={ultimo ? numero(ultimo.preco) : 'só se faltar'}
               />
             </label>
-            <label className="controle">
-              <span className="controle-rotulo">Código para buscar o preço</span>
-              <input
-                type="text"
-                value={simboloAtual}
-                onChange={(e) => {
-                  setSimbolo(e.target.value)
-                  setSimboloMexido(true)
-                }}
-              />
-            </label>
+            {!manual && (
+              <label className="controle">
+                <span className="controle-rotulo">Código para buscar o preço</span>
+                <input
+                  type="text"
+                  value={simboloAtual}
+                  onChange={(e) => {
+                    setSimbolo(e.target.value)
+                    setSimboloMexido(true)
+                  }}
+                />
+              </label>
+            )}
           </div>
-          <p className="muted pequeno">
-            O preço médio é o que você pagou, na moeda do ativo. O preço atual é atualizado sozinho
-            toda noite; só digite aqui se o ativo ainda estiver sem preço.
-          </p>
+          {manual ? (
+            <p className="muted pequeno">
+              Renda fixa e Tesouro Direto não têm cotação automática. Dica: use quantidade 1, o valor aplicado como
+              preço médio e, de tempos em tempos, digite o valor atual (o que o banco ou o Tesouro mostra) no campo
+              acima. Ele vale como preço de hoje.
+            </p>
+          ) : (
+            <p className="muted pequeno">
+              O preço médio é o que você pagou, na moeda do ativo. O preço atual é atualizado sozinho
+              toda noite; só digite aqui se o ativo ainda estiver sem preço.
+            </p>
+          )}
         </>
       )}
 

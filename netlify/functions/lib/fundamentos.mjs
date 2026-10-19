@@ -184,6 +184,6 @@ export function papelFundamentus(simbolo) {
 /** Qual fonte de fundamentos usar para cada tipo de ativo. */
 export function fonteFundamentos(classe) {
   if (classe === 'acao' || classe === 'fii') return 'fundamentus'
-  if (classe === 'exterior') return 'finnhub'
-  return null // ETF, BDR e cripto: sem indicadores fundamentalistas nesta versão
+  if (classe === 'stock' || classe === 'reit' || classe === 'adr') return 'finnhub'
+  return null // ETFs, BDRs, cripto e renda fixa: sem indicadores fundamentalistas nesta versão
 }
