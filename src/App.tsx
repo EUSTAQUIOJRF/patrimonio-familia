@@ -4,13 +4,13 @@ import Layout from './components/Layout'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { PreferenciasProvider } from './contexts/PreferenciasContext'
 import { supabaseConfigurado } from './lib/supabase'
-import EmBreve from './pages/EmBreve'
 import EsqueciSenha from './pages/EsqueciSenha'
 import Ajustes from './pages/Ajustes'
 import Ativos from './pages/Ativos'
 import Rendimentos from './pages/Rendimentos'
 import Favoritos from './pages/Favoritos'
 import Metas from './pages/Metas'
+import Comparar from './pages/Comparar'
 import Lancar from './pages/Lancar'
 import Patrimonio from './pages/Patrimonio'
 import Login from './pages/Login'
@@ -50,7 +50,7 @@ function Porteiro() {
         <Route path="rendimentos" element={<Rendimentos />} />
         <Route path="favoritos" element={<Favoritos />} />
         <Route path="metas" element={<Metas />} />
-        <Route path="comparar" element={<EmBreve titulo="Comparar ativos" fase="Fase 5" />} />
+        <Route path="comparar" element={<Comparar />} />
         <Route path="ajustes" element={<Ajustes />} />
         <Route path="seguranca" element={<Navigate to="/ajustes" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />

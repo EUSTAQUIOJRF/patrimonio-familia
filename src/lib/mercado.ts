@@ -55,3 +55,37 @@ export async function buscarNoticias(simbolos: string[], geral: boolean): Promis
   })
   return r.noticias
 }
+
+export interface Desempenho {
+  preco: number
+  moeda: string
+  serie: { d: string; v: number }[]
+  ret1m: number | null
+  ret6m: number | null
+  ret12m: number | null
+  retAno: number | null
+  min52: number
+  max52: number
+  vol: number
+  erro?: undefined
+}
+
+export interface Fundamentos {
+  fonte: string | null
+  indicadores?: Record<string, number | null>
+  erro?: string
+}
+
+export interface DadosComparacao {
+  desempenho: Desempenho | { erro: string }
+  fundamentos: Fundamentos
+}
+
+export async function buscarComparacao(
+  itens: { simbolo: string; classe: string }[],
+): Promise<Record<string, DadosComparacao>> {
+  const r = await chamar<{ itens: Record<string, DadosComparacao> }>('comparar', {
+    i: itens.map((x) => `${x.simbolo}|${x.classe}`).join(','),
+  })
+  return r.itens
+}

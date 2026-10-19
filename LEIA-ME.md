@@ -1,4 +1,4 @@
-# Patrimônio Família — Fases 0 a 4
+# Patrimônio Família — Fases 0 a 5
 
 Web-app (PWA) para acompanhar o patrimônio da família.
 
@@ -265,3 +265,39 @@ git push
 - Ritmo = média de crescimento mensal nos últimos 6 meses de saldos. Se você incluir uma pessoa ou conta nova nos saldos, o patrimônio "pula" e o ritmo fica otimista por um tempo. Trate a previsão como uma estimativa.
 - Previsões acima de 50 anos aparecem como "sem previsão". Metas de ativo ainda não têm previsão, só o quanto precisa por mês.
 - Valores em dólar usam a cotação de hoje.
+
+
+---
+
+# Fase 5 — Comparar ativos
+
+Escolha de **2 a 5 ativos** (os favoritos aparecem primeiro) e clique em **Comparar**. A tela mostra:
+- **Preço em 12 meses** (gráfico com o preço inicial igual a 100, uma linha por ativo, nome no fim de cada linha).
+- **Desempenho:** variação em 1 mês, 6 meses, 12 meses e no ano, volatilidade e mínimo/máximo de 52 semanas.
+- **Indicadores fundamentalistas:** P/L, P/VP, Dividend Yield, ROE, margens, dívida, valor de mercado etc., com ★ no melhor valor de cada linha. P/L negativo (prejuízo) não concorre.
+
+Não há tabela nova no banco: **não tem SQL nesta fase**.
+
+## Passo K — Publicar o código
+No Terminal do Mac:
+```bash
+cd ~/Documents/patrimonio-familia
+unzip -o ~/Downloads/patrimonio-familia-fase5.zip
+git add .
+git status --short
+git commit -m "Fase 5: comparar ativos"
+git push
+```
+(Windows: `Expand-Archive -Path "$HOME\Downloads\patrimonio-familia-fase5.zip" -DestinationPath "." -Force`.)
+
+## Passo L (opcional) — Indicadores de ativos do exterior
+De onde vêm os indicadores:
+- **Ações e FIIs do Brasil:** Fundamentus (site público, sem chave). A função lê a página de cada papel.
+- **Exterior (EUA):** Finnhub, que exige uma **chave gratuita**: crie conta em finnhub.io → copie a *API key*. Na Netlify: **Site configuration → Environment variables → Add a variable**, nome `FINNHUB_KEY`, valor = a chave. Depois **Deploys → Trigger deploy → Deploy site** (as funções leem a variável no deploy). Sem a chave, o ativo do exterior aparece só com o desempenho do preço.
+- **ETFs, BDRs e criptos:** só desempenho do preço (sem indicadores fundamentalistas).
+
+## Limites conhecidos (leia)
+- **Não consegui testar daqui as fontes reais** (sem internet externa). Os leitores foram testados com páginas e respostas de exemplo que eu mesmo montei, seguindo o formato conhecido do Fundamentus e do Finnhub. Se o Fundamentus mudar o layout, a coluna mostra o erro ("indicadores não reconhecidos") e o resto continua funcionando. Me envie o erro que eu ajusto.
+- O Fundamentus é uma fonte não oficial; use com moderação (cada comparação faz 1 consulta por ativo).
+- Indicadores de ações e FIIs são diferentes entre si; comparar os dois tipos é limitado.
+- Os dados podem ter atraso ou erro. Confirme antes de decidir qualquer coisa.

@@ -145,3 +145,37 @@ test('variação formatada com seta e sinal', () => {
   assert.equal(formatarVariacao(-0.5), '▼ -0,50%')
   assert.equal(formatarVariacao(0), '0,00%')
 })
+
+import { espalharRotulos, formatarIndicador, melhoresDaLinha, normalizarBase100 } from './indicadores.ts'
+
+test('indicadores: formatação e dado ausente', () => {
+  assert.equal(formatarIndicador(5.126, 'numero'), '5,13')
+  assert.equal(formatarIndicador(14.5, 'percentual'), '14,50%')
+  assert.equal(formatarIndicador(null, 'numero'), '—')
+  assert.equal(formatarIndicador(3.2e12, 'dinheiro'), '3,20 tri')
+  assert.equal(formatarIndicador(4.5e9, 'dinheiro'), '4,50 bi')
+  assert.equal(formatarIndicador(2.5e6, 'dinheiro'), '2,50 mi')
+})
+
+test('melhor da linha: menor/maior, empate, P/L negativo não vence, poucos dados não rankeiam', () => {
+  assert.deepEqual([...melhoresDaLinha([10, 5, 8], 'menor')], [1])
+  assert.deepEqual([...melhoresDaLinha([10, 5, 8], 'maior')], [0])
+  assert.deepEqual([...melhoresDaLinha([5, 5, 8], 'menor')].sort(), [0, 1])
+  assert.deepEqual([...melhoresDaLinha([-3, 12, 20], 'menor')], [1]) // prejuízo não é "barato"
+  assert.deepEqual([...melhoresDaLinha([null, 7, null], 'maior')], []) // só um valor: sem ranking
+  assert.deepEqual([...melhoresDaLinha([1, 2], null)], [])
+})
+
+test('base 100 e espalhamento de rótulos', () => {
+  const s = normalizarBase100([{ d: '2026-01-01', v: 50 }, { d: '2026-02-01', v: 75 }])
+  assert.equal(s[0].v, 100)
+  assert.equal(s[1].v, 150)
+  assert.ok(s[1].t > s[0].t)
+  const ys = espalharRotulos([100, 102, 101, 200], 12, 10, 220)
+  const ord = [...ys].sort((a, b) => a - b)
+  for (let i = 1; i < ord.length; i++) assert.ok(ord[i] - ord[i - 1] >= 12 - 1e-9)
+  assert.ok(Math.max(...ys) <= 220 && Math.min(...ys) >= 10)
+  // perto da base: puxa para cima sem sair do limite
+  const baixo = espalharRotulos([219, 220, 221], 12, 10, 225)
+  assert.ok(Math.max(...baixo) <= 225)
+})
