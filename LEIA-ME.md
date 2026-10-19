@@ -1,4 +1,4 @@
-# Patrimônio Família — Fases 0 a 3
+# Patrimônio Família — Fases 0 a 4
 
 Web-app (PWA) para acompanhar o patrimônio da família.
 
@@ -233,3 +233,35 @@ Confira na Netlify: **Logs → Functions** deve listar `cotacao` e `noticias`. A
 ## Limites conhecidos
 - Não pude testar as fontes de preço e de notícias daqui (sem internet externa); a leitura das respostas é coberta por testes, mas a primeira execução real é a sua. Se as notícias não aparecerem, me envie a mensagem que a tela mostrar.
 - Google Notícias e Yahoo são fontes gratuitas sem garantia; podem mudar ou limitar. O app avisa quando falham, e o resto continua funcionando.
+
+
+---
+
+# Fase 4 — Metas
+
+A tela **Metas** acompanha dois tipos de meta:
+- **Patrimônio:** um valor-alvo (em R$ ou US$) para a Família ou para uma pessoa, com prazo opcional.
+- **Ativo:** uma quantidade de cotas (ex.: 500 de XPML11) ou um valor em dinheiro para um ativo, da Família ou de uma pessoa (a Filha também pode ter meta de ativo), com prazo opcional.
+
+Cada meta mostra a barra de progresso, quanto já tem, quanto falta, o prazo, **quanto precisa avançar por mês para chegar no prazo** e a situação: atingida, no ritmo, atrasada, acompanhando ou sem prazo. Nas metas de patrimônio há também a **previsão de quando você chega lá**, mantendo o ritmo dos últimos 6 meses.
+
+## Passo I — Banco
+**SQL Editor → New query**, cole `supabase/05_fase4.sql` e **Run** (cria a tabela `metas`).
+
+## Passo J — Publicar o código
+No Terminal do Mac:
+```bash
+cd ~/Documents/patrimonio-familia
+unzip -o ~/Downloads/patrimonio-familia-fase4.zip
+git add .
+git status --short
+git commit -m "Fase 4: metas"
+git push
+```
+(Windows: `Expand-Archive -Path "$HOME\Downloads\patrimonio-familia-fase4.zip" -DestinationPath "." -Force`.)
+
+## Como as contas funcionam
+- Patrimônio da meta = o mesmo total da tela Patrimônio (saldos lançados). A carteira de Ativos não é somada de novo, para não contar em dobro.
+- Ritmo = média de crescimento mensal nos últimos 6 meses de saldos. Se você incluir uma pessoa ou conta nova nos saldos, o patrimônio "pula" e o ritmo fica otimista por um tempo. Trate a previsão como uma estimativa.
+- Previsões acima de 50 anos aparecem como "sem previsão". Metas de ativo ainda não têm previsão, só o quanto precisa por mês.
+- Valores em dólar usam a cotação de hoje.

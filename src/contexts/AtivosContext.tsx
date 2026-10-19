@@ -10,6 +10,7 @@ import {
 import { supabase } from '../lib/supabase'
 import { traduzirErroAuth, type Moeda } from '../lib/formato'
 import type { Ativo, ClasseAtivo, Cotacao, Favorito, Posicao, Provento, TipoProvento } from '../lib/tipos'
+import type { Meta, TipoMeta } from '../lib/metas'
 
 interface AtivosContexto {
   ativos: Ativo[]
@@ -20,6 +21,9 @@ interface AtivosContexto {
   favoritos: Favorito[]
   /** Aviso se a tabela de favoritos ainda não existe (Fase 3 não instalada). */
   avisoFavoritos: string | null
+  metas: Meta[]
+  /** Aviso se a tabela de metas ainda não existe (Fase 4 não instalada). */
+  avisoMetas: string | null
   carregando: boolean
   erro: string | null
   recarregar: () => Promise<void>
@@ -63,12 +67,14 @@ export function AtivosProvider({ children }: { children: ReactNode }) {
   const [proventos, setProventos] = useState<Provento[]>([])
   const [favoritos, setFavoritos] = useState<Favorito[]>([])
   const [avisoFavoritos, setAvisoFavoritos] = useState<string | null>(null)
+  const [metas, setMetas] = useState<Meta[]>([])
+  const [avisoMetas, setAvisoMetas] = useState<string | null>(null)
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
 
   const recarregar = useCallback(async () => {
     try {
-      const [a, p, c, pr, fav] = await Promise.all([
+      const [a, p, c, pr, fav, met] = await Promise.all([
         supabase
           .from('ativos')
           .select('id, ticker, nome, classe, moeda, simbolo_cotacao, ativo')
@@ -77,6 +83,10 @@ export function AtivosProvider({ children }: { children: ReactNode }) {
         supabase.from('cotacoes_ultimas').select('ativo_id, data, preco, fonte'),
         buscarProventos(),
         supabase.from('favoritos').select('ativo_id, ordem').order('ordem'),
+        supabase
+          .from('metas')
+          .select('id, tipo, nome, pessoa_id, ativo_id, alvo_valor, alvo_quantidade, moeda_alvo, prazo')
+          .order('criado_em'),
       ])
       if (a.error) throw new Error(a.error.message)
       if (p.error) throw new Error(p.error.message)
@@ -125,6 +135,27 @@ export function AtivosProvider({ children }: { children: ReactNode }) {
         setFavoritos(fav.data.map((r) => ({ ativo_id: r.ativo_id as string, ordem: Number(r.ordem) })))
         setAvisoFavoritos(null)
       }
+      if (met.error) {
+        setMetas([])
+        setAvisoMetas(
+          'A tabela de metas ainda não existe. Rode o arquivo supabase/05_fase4.sql no SQL Editor do Supabase.',
+        )
+      } else {
+        setMetas(
+          met.data.map((r) => ({
+            id: r.id as string,
+            tipo: r.tipo as TipoMeta,
+            nome: (r.nome as string | null) ?? null,
+            pessoa_id: (r.pessoa_id as string | null) ?? null,
+            ativo_id: (r.ativo_id as string | null) ?? null,
+            alvo_valor: r.alvo_valor === null ? null : Number(r.alvo_valor),
+            alvo_quantidade: r.alvo_quantidade === null ? null : Number(r.alvo_quantidade),
+            moeda_alvo: r.moeda_alvo as Moeda,
+            prazo: (r.prazo as string | null) ?? null,
+          })),
+        )
+        setAvisoMetas(null)
+      }
       setErro(null)
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e)
@@ -144,8 +175,8 @@ export function AtivosProvider({ children }: { children: ReactNode }) {
   }, [recarregar])
 
   const valor = useMemo(
-    () => ({ ativos, posicoes, cotacoes, proventos, favoritos, avisoFavoritos, carregando, erro, recarregar }),
-    [ativos, posicoes, cotacoes, proventos, favoritos, avisoFavoritos, carregando, erro, recarregar],
+    () => ({ ativos, posicoes, cotacoes, proventos, favoritos, avisoFavoritos, metas, avisoMetas, carregando, erro, recarregar }),
+    [ativos, posicoes, cotacoes, proventos, favoritos, avisoFavoritos, metas, avisoMetas, carregando, erro, recarregar],
   )
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>
 }

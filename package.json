@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "node --test src/lib/calculos.test.ts src/lib/ativos.test.ts scripts/cotacoes.test.mjs netlify/functions/lib/mercado.test.mjs"
+    "test": "node --test src/lib/calculos.test.ts src/lib/ativos.test.ts src/lib/metas.test.ts scripts/cotacoes.test.mjs netlify/functions/lib/mercado.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

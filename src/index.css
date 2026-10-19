@@ -1187,3 +1187,36 @@ input[type='month'] {
 .noticia-titulo:hover {
   text-decoration: underline;
 }
+
+/* ===== Fase 4: metas ===== */
+.meta-trilha {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--serie-1-trilha);
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+.meta-preench {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--serie-1);
+}
+.meta-numeros {
+  margin: 0.25rem 0;
+}
+.meta-situacao {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.meta-atingida,
+.meta-no_ritmo {
+  color: var(--cor-ok);
+}
+.meta-atrasada {
+  color: var(--cor-alerta);
+}
+.meta-acompanhando,
+.meta-sem_prazo {
+  color: var(--cor-texto-suave);
+}
